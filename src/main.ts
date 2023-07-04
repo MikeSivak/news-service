@@ -1,9 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app: INestApplication = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const configService: ConfigService = app.get(ConfigService);
+  const host: string = configService.get<string>('APP_HOST');
+  const port: number = configService.get<number>('APP_PORT');
+  await app.listen(port, () => {
+    Logger.log(`[NEWS-SERVICE]: is listening ${host}:${port}`);
+  });
 }
+
 bootstrap();
