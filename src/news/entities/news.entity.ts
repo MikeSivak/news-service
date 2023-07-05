@@ -24,7 +24,7 @@ export class News {
   @Column({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne((type) => User)
+  @ManyToOne((type) => User, { nullable: false })
   @JoinColumn({ name: 'created_by' })
   createdBy: number;
 }

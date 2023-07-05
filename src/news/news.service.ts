@@ -1,26 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { News } from './entities/news.entity';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class NewsService {
-  create(createNewsDto: CreateNewsDto) {
-    return 'This action adds a new news';
+  constructor(
+    @InjectRepository(News) private readonly newsRepository: Repository<News>,
+  ) {}
+
+  async create(createNewsDto: CreateNewsDto): Promise<News> {
+    try {
+      return await this.newsRepository.save({
+        ...createNewsDto,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        //TODO: get userId from req
+        createdBy: 2,
+      });
+    } catch (e) {
+      Logger.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 
-  findAll() {
-    return `This action returns all news`;
+  async findAll(): Promise<News[]> {
+    try {
+      return await this.newsRepository.find();
+    } catch (e) {
+      Logger.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} news`;
+  async findOne(id: number): Promise<News> {
+    try {
+      return await this.newsRepository.findOneBy({ id });
+    } catch (e) {
+      Logger.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 
-  update(id: number, updateNewsDto: UpdateNewsDto) {
-    return `This action updates a #${id} news`;
+  //TODO: add check on userId === createdBy
+  async update(
+    id: number,
+    updateNewsDto: UpdateNewsDto,
+  ): Promise<UpdateResult> {
+    try {
+      return await this.newsRepository.update(
+        { id },
+        { ...updateNewsDto, updatedAt: new Date().toISOString() },
+      );
+    } catch (e) {
+      Logger.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} news`;
+  //TODO: add check on userId === createdBy
+  async remove(id: number): Promise<DeleteResult> {
+    try {
+      return await this.newsRepository.delete(id);
+    } catch (e) {
+      Logger.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 }
