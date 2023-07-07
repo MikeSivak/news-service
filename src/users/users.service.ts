@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -8,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { hashDataHelper } from '../shared/helpers/hash-data.helper';
 
 @Injectable()
 export class UsersService {
@@ -69,6 +71,27 @@ export class UsersService {
       Logger.log(e);
       throw new InternalServerErrorException();
     }
+  }
+
+  async updateRefreshToken(
+    userId: number,
+    refreshToken?: string,
+  ): Promise<boolean> {
+    const hashedToken = refreshToken
+      ? await hashDataHelper(refreshToken)
+      : null;
+    console.log(hashedToken);
+    try {
+      const updatedUser: UpdateResult = await this.userRepository.update(
+        { id: userId },
+        { refreshToken: hashedToken },
+      );
+      if (updatedUser?.affected) return true;
+    } catch (e) {
+      Logger.log(e);
+      throw new BadRequestException();
+    }
+    return false;
   }
 
   async remove(id: number): Promise<DeleteResult> {

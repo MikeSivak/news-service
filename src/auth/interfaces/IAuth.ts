@@ -1,4 +1,4 @@
 export interface IAuth {
-  user: any;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }

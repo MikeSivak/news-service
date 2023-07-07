@@ -12,6 +12,9 @@ export class User {
   @Column({ name: 'password', nullable: false, default: '' })
   password: string;
 
+  @Column({ name: 'refresh_token', nullable: true, default: null })
+  refreshToken: string;
+
   @Column({ name: 'created_at' })
   createdAt: Date;
 
