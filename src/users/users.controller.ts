@@ -8,22 +8,17 @@ import {
   Delete,
   ParseIntPipe,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    //TODO: add hash func for password
-    return await this.usersService.create(createUserDto);
-  }
 
   @Get()
   async findAll(): Promise<User[]> {
@@ -35,6 +30,7 @@ export class UsersController {
     return await this.usersService.findOne(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -50,6 +46,7 @@ export class UsersController {
     return true;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
     const deletedUser: DeleteResult = await this.usersService.remove(id);

@@ -47,6 +47,15 @@ export class UsersService {
     }
   }
 
+  async findOneByUserName(username: string): Promise<User> {
+    try {
+      return await this.userRepository.findOneBy({ username });
+    } catch (e) {
+      Logger.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+
   async update(
     id: number,
     updateUserDto: UpdateUserDto,

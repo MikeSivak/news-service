@@ -8,21 +8,27 @@ import {
   Delete,
   ParseIntPipe,
   NotFoundException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { News } from './entities/news.entity';
 import { DeleteResult, UpdateResult } from 'typeorm';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  //TODO: implement guard to get user info -> set createdBy = userId from req;
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  async create(@Body() createNewsDto: CreateNewsDto): Promise<News> {
-    return await this.newsService.create(createNewsDto);
+  async create(
+    @Body() createNewsDto: CreateNewsDto,
+    @Req() req: any,
+  ): Promise<News> {
+    return await this.newsService.create(createNewsDto, req.user?.id);
   }
 
   @Get()
@@ -35,7 +41,7 @@ export class NewsController {
     return await this.newsService.findOne(id);
   }
 
-  //TODO: implement guard to get user info -> check if createdBy = userId from req;
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -51,7 +57,7 @@ export class NewsController {
     return true;
   }
 
-  //TODO: implement guard to get user info -> check if createdBy = userId from req;
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
     const deletedNews: DeleteResult = await this.newsService.remove(id);

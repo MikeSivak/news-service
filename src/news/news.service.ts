@@ -15,14 +15,13 @@ export class NewsService {
     @InjectRepository(News) private readonly newsRepository: Repository<News>,
   ) {}
 
-  async create(createNewsDto: CreateNewsDto): Promise<News> {
+  async create(createNewsDto: CreateNewsDto, createdBy: number): Promise<News> {
     try {
       return await this.newsRepository.save({
         ...createNewsDto,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        //TODO: get userId from req
-        createdBy: 2,
+        createdBy,
       });
     } catch (e) {
       Logger.log(e);

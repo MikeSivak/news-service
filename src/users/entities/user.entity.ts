@@ -1,15 +1,15 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
-@Unique(['email'])
+@Unique(['username'])
 export class User {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ name: 'email', nullable: false, default: false })
-  email: string;
+  @Column({ name: 'username', nullable: false, default: false })
+  username: string;
 
-  @Column({ name: 'password', nullable: false, default: false })
+  @Column({ name: 'password', nullable: false, default: '' })
   password: string;
 
   @Column({ name: 'created_at' })
