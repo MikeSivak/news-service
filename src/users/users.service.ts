@@ -80,7 +80,6 @@ export class UsersService {
     const hashedToken = refreshToken
       ? await hashDataHelper(refreshToken)
       : null;
-    console.log(hashedToken);
     try {
       const updatedUser: UpdateResult = await this.userRepository.update(
         { id: userId },
